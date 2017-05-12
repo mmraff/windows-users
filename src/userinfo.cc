@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <assert.h>
+#include <memory.h>  // memset
 #include "userinfo.h"
 #include "wstrutils.h"
 
