@@ -1,6 +1,6 @@
 {
   "name": "windows-users",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Native addon for Node.js to query Windows User API",
   "license": "MIT",
   "author": {
