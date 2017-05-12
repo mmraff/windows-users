@@ -55,6 +55,7 @@ permissions versus the particular security configuration of the domain.
 ## API
 
 <a name="list-sync"></a>
+
 ### users.list([options])
 *Synchronous.* Returns a list of all user accounts known to the local system,
 optionally according to the specified options.
@@ -82,6 +83,7 @@ optionally according to the specified options.
   the accounts with type(s) matching the specified value(s).
 
 <a name="list-async"></a>
+
 ### users.list([options,] [hostname,] callback)
 *Asynchronous.* Passes a list of all user accounts known to the local system
 (or on the system named by `hostname` instead) to the `callback` function.
@@ -99,6 +101,7 @@ passed back.
   if no error.
 
 <a name="getdetails-sync"></a>
+
 ### users.getDetails(username [, fullDetails])
 *Synchronous.* Returns information about the named user account if it is known
 on the local system; otherwise an `Error` is thrown.
@@ -110,6 +113,7 @@ on the local system; otherwise an `Error` is thrown.
   listed in the [Additional Fields](#fulldetails) table.
 
 <a name="getdetails-async"></a>
+
 ### users.getDetails(username [, fullDetails] [, hostname], callback)
 *Asynchronous.* Passes the account information for the named user (optionally
 on the system named by `hostname`) to the `callback` function, if the username
@@ -126,6 +130,7 @@ given and it is unknown or cannot be accessed, an `Error` is passed back.
     if no error.
 
 <a name="getggroups-sync"></a>
+
 ### users.getGlobalGroups(username)
 *Synchronous.* Returns the list of global groups to which the named user account
 belongs, if the `username` is known on the local system; otherwise an `Error` is
@@ -134,6 +139,7 @@ thrown.
 - Return: {Array} array of global group names as strings
 
 <a name="getggroups-async"></a>
+
 ### users.getGlobalGroups(username [, hostname], callback)
 *Asynchronous.* Retrieves the list of global groups to which the named user
 account belongs (optionally on the system named by `hostname`) and passes it to
@@ -150,6 +156,7 @@ cannot be accessed, an `Error` is passed back.
     if no error.
 
 <a name="getlgroups-sync"></a>
+
 ### users.getLocalGroups(username)
 *Synchronous.* Returns the list of local groups to which the named user account
 belongs, if the `username` is known on the local system; otherwise an `Error` is
@@ -158,6 +165,7 @@ thrown.
 - Return: {Array} array of local group names as strings
 
 <a name="getlgroups-async"></a>
+
 ### users.getLocalGroups(username [, hostname], callback)
 *Asynchronous.* Retrieves the list of local groups to which the named user
 account belongs (optionally on the system named by `hostname`) and passes it to
@@ -174,6 +182,7 @@ cannot be accessed, an `Error` is passed back.
     if no error.
 
 <a name="accttypeconsts"></a>
+
 ### User Account Type Constants
 - **`users.constants.NORMAL`** - Default account type, representing a typical user.
   The corresponding string value returned for the `accountType` field is `"normal"`.
@@ -191,8 +200,11 @@ cannot be accessed, an `Error` is passed back.
   field value is `"server trust"`.
 
 <a name="enumfields"></a>
+
 ### Enumeration Fields
+
 <style>td { vertical-align: top; }</style>
+
 <table>
   <thead>
     <tr><th>Field Name</th><th>Type</th><th>Description</th></tr>
@@ -291,6 +303,7 @@ corresponding flags under the description of the **usri20_flags** field on
 [this page at MSDN.microsoft.com](https://msdn.microsoft.com/en-us/library/windows/desktop/aa371123.aspx).
 
 <a name="fulldetails"></a>
+
 ### Additional Fields Available through `getDetails()`
 <table>
   <thead>
@@ -416,6 +429,7 @@ corresponding flags under the description of the **usri20_flags** field on
 </table>
 
 <a name="logonhours"></a>
+
 #### **Logon Hours: How To...**
 As noted above, the values in the `logonHours` structure are according to
 Greenwich Mean Time (GMT). You will probably want to convert to values relative
