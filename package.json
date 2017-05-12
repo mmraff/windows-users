@@ -1,0 +1,42 @@
+{
+  "name": "windows-users",
+  "version": "0.0.0",
+  "description": "Native addon for Node.js to query Windows User API",
+  "license": "MIT",
+  "author": {
+    "name": "Matthew Rafferty",
+    "email": "mmraff@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mmraff/windows-users.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mmraff/windows-users/issues"
+  },
+  "os": [ "win32" ],
+  "main": "index.js",
+  "gypfile": true,
+  "dependencies": {
+    "bindings": "~1.2.1",
+    "nan": "2.4.x"
+  },
+  "devDependencies": {
+    "chai": "^3.4",
+    "mocha": ">=2.5"
+  },
+  "scripts": {
+    "test": "mocha",
+    "install": "node-gyp rebuild"
+  },
+  "keywords": [
+    "windows",
+    "user",
+    "account",
+    "system",
+    "win32",
+    "native",
+    "userinfo"
+  ],
+  "homepage": "https://github.com/mmraff/windows-users#readme"
+}
