@@ -203,8 +203,6 @@ cannot be accessed, an `Error` is passed back.
 
 ### Enumeration Fields
 
-<style>td { vertical-align: top; }</style>
-
 <table>
   <thead>
     <tr><th>Field Name</th><th>Type</th><th>Description</th></tr>
