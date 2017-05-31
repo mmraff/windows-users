@@ -71,6 +71,15 @@ Nan::Callback* UsersArgsResolver::GetCallback()
 
 // --- UsersListArgsResolver -------------------------------------------------
 
+// Strictly a local utility function
+Local<String> getProtoName(const Local<Object>* pObj = NULL)
+{
+  const Local<Object>& obj = pObj ? *pObj : Nan::New<Object>();
+  return Nan::ObjectProtoToString(obj).ToLocalChecked();
+}
+
+const Nan::Utf8String UsersListArgsResolver::objProtoName(getProtoName());
+
 UsersListArgsResolver::UsersListArgsResolver(
   const Nan::FunctionCallbackInfo<v8::Value>& callerInfo
 ) : UsersArgsResolver(callerInfo), _detailed(false), _filterVal(0)
@@ -82,11 +91,9 @@ UsersListArgsResolver::UsersListArgsResolver(
   if (_info[0]->IsObject()) {
 
     Local<Object> opts = _info[0].As<Object>();
-    Local<Object> refObj = Nan::New<v8::Object>();
-    Nan::Utf8String argProtoName(opts->ObjectProtoToString());
-    Nan::Utf8String refProtoName(refObj->ObjectProtoToString());
+    Nan::Utf8String argProtoName(getProtoName(&opts));
     // Nan code for Utf8String uses null termination, so this is OK:
-    if (strcmp(*argProtoName, *refProtoName) == 0)
+    if (strcmp(*argProtoName, *objProtoName) == 0)
     {
       // This arg is a plain old JS object; we expect it to be
       // the container for options.

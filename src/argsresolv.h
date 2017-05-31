@@ -27,6 +27,8 @@ class UsersArgsResolver {
 };
 
 class UsersListArgsResolver : public UsersArgsResolver {
+  static const Nan::Utf8String objProtoName;
+
   public:
     UsersListArgsResolver(const Nan::FunctionCallbackInfo<v8::Value>&);
     inline bool DetailsWanted() { return _detailed; }
