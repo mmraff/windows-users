@@ -9,6 +9,7 @@
 #include <windows.h>
 #include <lm.h>
 #include <wchar.h>
+#include <stdexcept>
 #include "userinfo.h"
 #include "api2info.h"
 #include "xferlist.h"
@@ -53,8 +54,9 @@ XferList<char*>* getUserNameList(const wchar_t* pServerNameW, unsigned filter)
 
     if (status != NERR_Success && status != ERROR_MORE_DATA)
     {
+      if (pBuffer != NULL) NetApiBufferFree(pBuffer);
       if (pList != NULL) delete pList;
-      throw new APISnag(status);
+      throw APIError(status);
     }
 
     if (pList == NULL) pList = new XferList<char*>();
@@ -76,7 +78,7 @@ XferList<char*>* getUserNameList(const wchar_t* pServerNameW, unsigned filter)
       try {
         pList->AddItem(pInEntry->usri0_name);
       }
-      catch (...) { // TODO: Work out a way to ensure a Snag gets thrown from here
+      catch (...) {
         delete pList;
         NetApiBufferFree(pBuffer);
         throw;
@@ -127,7 +129,7 @@ XferList<struct UserInfo>* getUserInfoList(const wchar_t* pServerNameW, unsigned
     if (status != NERR_Success && status != ERROR_MORE_DATA)
     {
       if (pList != NULL) delete pList;
-      throw new APISnag(status);
+      throw APIError(status);
     }
 
     if (pList == NULL) pList = new XferList<struct UserInfo>();
@@ -135,7 +137,7 @@ XferList<struct UserInfo>* getUserInfoList(const wchar_t* pServerNameW, unsigned
     if (pBuffer == NULL) break;
 
     try { pList->Expand(entriesReadArg); }
-    catch (...) { // TODO: Work out a way to ensure a Snag gets thrown from here
+    catch (...) {
       delete pList;
       NetApiBufferFree(pBuffer);
       throw;

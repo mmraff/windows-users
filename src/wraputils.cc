@@ -5,7 +5,6 @@
 #include "wstrutils.h"
 #include "deepinfo.h"
 #include "xferlist.h"
-#include "usererrs.h"
 
 using namespace v8;
 using namespace mmrwinusers;

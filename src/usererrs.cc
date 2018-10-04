@@ -3,7 +3,7 @@
 #include <lmerr.h>
 #include "usererrs.h"
 
-const char* APISnag::message()
+const char* APIError::what() const noexcept
 {
   switch (_code)
   {
@@ -24,7 +24,7 @@ const char* APISnag::message()
       return "the given hostname is malformed";
 // TODO: since the following case can come from ConvertSidToStringSid *or*
 // from NetUserGetLocalGroups, and the likely cause is so different, we
-// should build another field into the Snag class for extra information.
+// should build another field into this class for extra information.
 // Example: for ConvertSidToStringSid it might be "check destination pointer",
 // while for NetUserGetLocalGroups it might be "check flags parameter"
     case ERROR_INVALID_PARAMETER:
@@ -53,7 +53,7 @@ const char* APISnag::message()
   return NULL;
 }
 
-const char* SystemSnag::message()
+const char* SysError::what() const noexcept
 {
   switch (_code)
   {
@@ -65,7 +65,7 @@ const char* SystemSnag::message()
   return NULL;
 }
 
-const char* UsageSnag::message()
+const char* UsageError::what() const noexcept
 {
   switch (_code)
   {

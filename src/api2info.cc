@@ -164,10 +164,10 @@ void translateUserInfo4(LPUSER_INFO_4 pApiInfo, struct UserDeepInfo& userInfo)
 
   wchar_t* pSidW = NULL;
   if (!ConvertSidToStringSid(pApiInfo->usri4_user_sid, &pSidW))
-    throw new APISnag(GetLastError());
+    throw APIError(GetLastError());
   userInfo.SetString(UserField::sid, pSidW);
   if (LocalFree(pSidW) != NULL)
-    throw new SystemSnag(GetLastError());
+    throw SysError(GetLastError());
 
   if (pApiInfo->usri4_home_dir)
     userInfo.SetString(UserField::homeDir, pApiInfo->usri4_home_dir);

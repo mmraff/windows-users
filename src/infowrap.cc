@@ -18,57 +18,54 @@ class UserInfoWorker : public Nan::AsyncWorker {
     UserInfoWorker(UsersUserArgsResolver& inArgs)
       : Nan::AsyncWorker(inArgs.GetCallback()),
         _getDetailed(inArgs.FullDetailsWanted()), _pUserNameW(NULL),
-        _pSrvNameW(NULL), _pData(NULL), _pSnag(NULL)
+        _pSrvNameW(NULL), _pData(NULL), _errCode(0)
     {
       try {
         _pUserNameW = getWideStrCopy(*(Nan::Utf8String(inArgs.GetUserName())));
       }
-      catch (Snag* pS) {
-        _pSnag = pS;
-        SetErrorMessage("ERROR");
+      catch (WinUsersError& er) {
+        _errCode = er.code();
+        SetErrorMessage(er.what());
+        return;
       }
-      if (_pSnag) return;
 
       if (inArgs.HasHostName())
       {
         try { 
           _pSrvNameW = getWideStrCopy(*(Nan::Utf8String(inArgs.GetHostName())));
         }
-        catch (Snag* pS) {
-          _pSnag = pS;
-          SetErrorMessage("ERROR");
+        catch (WinUsersError& er) {
+          _errCode = er.code();
+          SetErrorMessage(er.what());
+          free(_pUserNameW);
         }
       }
     }
 
-    ~UserInfoWorker()
-    {
-      if (_pUserNameW) free(_pUserNameW);
-      if (_pSrvNameW) free(_pSrvNameW);
-      if (_pData) workaroundDeleteData();
-      if (_pSnag) delete _pSnag;
-    }
+    ~UserInfoWorker() {}
 
     void Execute()
     {
-      if (_pSnag) return;
+      if (_errCode != 0) return;
 
       try {
         _pData = getUserDetails(_pUserNameW, _pSrvNameW, _getDetailed);
       }
-      catch (Snag* pS)
+      catch (WinUsersError& er)
       {
-        _pSnag = pS;
-        SetErrorMessage("AARGH");
+        _errCode = er.code();
+        SetErrorMessage(er.what());
       }
+      free(_pUserNameW);
+      if (_pSrvNameW) free(_pSrvNameW);
     }
 
     void HandleErrorCallback()
     {
       const unsigned argc = 1;
-      Local<Value> exc = (_pSnag->message() == NULL) ?
-        Nan::ErrnoException(_pSnag->code(), NULL, "Unknown error") :
-        Nan::Error(_pSnag->message());
+      Local<Value> exc = (this->ErrorMessage() == NULL) ?
+        Nan::ErrnoException(_errCode, NULL, "Unknown error") :
+        Nan::Error(this->ErrorMessage());
       Local<Value> argv[argc] = { exc };
       callback->Call(argc, argv);
     }
@@ -80,23 +77,20 @@ class UserInfoWorker : public Nan::AsyncWorker {
         Nan::Null(),
         transformUserInfoPlus(*_pData, _getDetailed)
       };
-      workaroundDeleteData();
+
+      if (_getDetailed) delete (struct UserDeepInfo*) _pData;
+      else delete _pData;
       _pData = NULL;
+
       callback->Call(argc, argv);
     }
 
   private:
-    void workaroundDeleteData()
-    {
-      if (_getDetailed) delete (struct UserDeepInfo*) _pData;
-      else delete _pData;
-    }
-
     wchar_t* _pUserNameW;
     wchar_t* _pSrvNameW;
     bool _getDetailed;
     UserInfo* _pData;
-    Snag* _pSnag;
+    unsigned long _errCode;
 };
 
 NAN_METHOD(usersGetDetails) {
@@ -120,12 +114,12 @@ NAN_METHOD(usersGetDetails) {
       free(pUserNameW);
       pUserNameW = NULL;
     }
-    catch (Snag* pSnag)
+    catch (WinUsersError& er)
     {
-      Local<Value> exc = (pSnag->message() == NULL) ?
-        Nan::ErrnoException(pSnag->code(), NULL, "Unknown error") :
-        Nan::Error(pSnag->message());
-      delete pSnag;
+      Local<Value> exc = (er.what() == NULL) ?
+        Nan::ErrnoException(er.code(), NULL, "Unknown error") :
+        Nan::Error(er.what());
+
       if (pUserNameW) free(pUserNameW);
       return Nan::ThrowError(exc);
     }

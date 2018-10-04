@@ -62,7 +62,7 @@ XferList<char*>* getUserGroupsList(
   }
 
   if (status != NERR_Success)
-    throw new APISnag(status);
+    throw APIError(status);
 
   pList = new XferList<char*>();
 

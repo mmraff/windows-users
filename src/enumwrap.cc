@@ -33,7 +33,7 @@ class UserEnumWorker : public Nan::AsyncWorker {
       : Nan::AsyncWorker(inArgs.GetCallback()),
         _getDetailed(inArgs.DetailsWanted()),
         _filterVal(inArgs.GetFilterValue()),
-        _pSrvNameW(NULL), _pList(NULL), _pSnag(NULL)
+        _pSrvNameW(NULL), _pList(NULL), _errCode(0)
     {
       if (inArgs.HasHostName())
       {
@@ -41,42 +41,38 @@ class UserEnumWorker : public Nan::AsyncWorker {
         try { 
           _pSrvNameW = getWideStrCopy(*(*pName));
         }
-        catch (Snag* pS) {
-          _pSnag = pS;
-          SetErrorMessage("ERROR");
+        catch (WinUsersError& er) {
+          _errCode = er.code();
+          SetErrorMessage(er.what());
         }
         delete pName;
       }
     }
 
-    ~UserEnumWorker()
-    {
-      if (_pSrvNameW) free(_pSrvNameW);
-      if (_pList) delete _pList;
-      if (_pSnag) delete _pSnag;
-    }
+    ~UserEnumWorker() {}
 
     void Execute()
     {
-      if (_pSnag != NULL) return;
+      if (_errCode != 0) return;
 
       try {
         if (_getDetailed) _pList = getUserInfoList(_pSrvNameW, _filterVal);
         else _pList = getUserNameList(_pSrvNameW, _filterVal);
       }
-      catch (Snag* pS)
+      catch (WinUsersError& er)
       {
-        _pSnag = pS;
-        SetErrorMessage("AARGH");
+        _errCode = er.code();
+        SetErrorMessage(er.what());
       }
+      if (_pSrvNameW) free(_pSrvNameW);
     }
 
     void HandleErrorCallback()
     {
       const unsigned argc = 1;
-      Local<Value> exc = (_pSnag->message() == NULL) ?
-        Nan::ErrnoException(_pSnag->code(), NULL, "Unknown error") :
-        Nan::Error(_pSnag->message());
+      Local<Value> exc = (this->ErrorMessage() == NULL) ?
+        Nan::ErrnoException(_errCode, NULL, "Unknown error") :
+        Nan::Error(this->ErrorMessage());
       Local<Value> argv[argc] = { exc };
       callback->Call(argc, argv);
     }
@@ -97,7 +93,7 @@ class UserEnumWorker : public Nan::AsyncWorker {
     unsigned _filterVal;
     wchar_t* _pSrvNameW;
     void* _pList;
-    Snag* _pSnag;
+    unsigned long _errCode;
 };
 
 NAN_METHOD(usersList) {
@@ -118,12 +114,11 @@ NAN_METHOD(usersList) {
         pList = getUserInfoList(NULL, args.GetFilterValue());
       else pList = getUserNameList(NULL, args.GetFilterValue());
     }
-    catch (Snag* pSnag)
+    catch (WinUsersError& er)
     {
-      Local<Value> exc = (pSnag->message() == NULL) ?
-        Nan::ErrnoException(pSnag->code(), NULL, "Unknown error") :
-        Nan::Error(pSnag->message());
-      delete pSnag;
+      Local<Value> exc = (er.what() == NULL) ?
+        Nan::ErrnoException(er.code(), NULL, "Unknown error") :
+        Nan::Error(er.what());
       return Nan::ThrowError(exc);
     }
 

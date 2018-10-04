@@ -16,57 +16,53 @@ class GroupListWorker : public Nan::AsyncWorker {
   public:
     GroupListWorker(UsersUserArgsResolver& inArgs, bool global = false)
       : Nan::AsyncWorker(inArgs.GetCallback()), _global(global),
-        _pUserNameW(NULL), _pSrvNameW(NULL), _pList(NULL), _pSnag(NULL)
+        _pUserNameW(NULL), _pSrvNameW(NULL), _pList(NULL), _errCode(0)
     {
       try {
         _pUserNameW = getWideStrCopy(*(Nan::Utf8String(inArgs.GetUserName())));
       }
-      catch (Snag* pS) {
-        _pSnag = pS;
-        SetErrorMessage("ERROR");
+      catch (WinUsersError& er) {
+        _errCode = er.code();
+        SetErrorMessage(er.what());
+        return;
       }
-      if (_pSnag) return;
 
       if (inArgs.HasHostName())
       {
         try { 
           _pSrvNameW = getWideStrCopy(*(Nan::Utf8String(inArgs.GetHostName())));
         }
-        catch (Snag* pS) {
-          _pSnag = pS;
-          SetErrorMessage("ERROR");
+        catch (WinUsersError& er) {
+          _errCode = er.code();
+          SetErrorMessage(er.what());
         }
       }
     }
 
-    ~GroupListWorker()
-    {
-      if (_pUserNameW) free(_pUserNameW);
-      if (_pSrvNameW) free(_pSrvNameW);
-      if (_pList) delete _pList;
-      if (_pSnag) delete _pSnag;
-    }
+    ~GroupListWorker() {}
 
     void Execute()
     {
-      if (_pSnag != NULL) return;
+      if (_errCode != 0) return;
 
       try {
         _pList = getUserGroupsList(_pUserNameW, _pSrvNameW, _global);
       }
-      catch (Snag* pS)
+      catch (WinUsersError& er)
       {
-        _pSnag = pS;
-        SetErrorMessage("OH NO");
+        _errCode = er.code();
+        SetErrorMessage(er.what());
       }
+      free(_pUserNameW);
+      if (_pSrvNameW) free(_pSrvNameW);
     }
 
     void HandleErrorCallback()
     {
       const unsigned argc = 1;
-      Local<Value> exc = (_pSnag->message() == NULL) ?
-        Nan::ErrnoException(_pSnag->code(), NULL, "Unknown error") :
-        Nan::Error(_pSnag->message());
+      Local<Value> exc = (this->ErrorMessage() == NULL) ?
+        Nan::ErrnoException(_errCode, NULL, "Unknown error") :
+        Nan::Error(this->ErrorMessage());
       Local<Value> argv[argc] = { exc };
       callback->Call(argc, argv);
     }
@@ -87,7 +83,7 @@ class GroupListWorker : public Nan::AsyncWorker {
     wchar_t* _pUserNameW;
     wchar_t* _pSrvNameW;
     void* _pList;
-    Snag* _pSnag;
+    unsigned long _errCode;
 };
 
 void _usersGetGroups(const Nan::FunctionCallbackInfo<v8::Value>& info, bool global)
@@ -110,12 +106,12 @@ void _usersGetGroups(const Nan::FunctionCallbackInfo<v8::Value>& info, bool glob
       free(pUserNameW);
       pUserNameW = NULL;
     }
-    catch (Snag* pSnag)
+    catch (WinUsersError& er)
     {
-      Local<Value> exc = (pSnag->message() == NULL) ?
-        Nan::ErrnoException(pSnag->code(), NULL, "Unknown error") :
-        Nan::Error(pSnag->message());
-      delete pSnag;
+      Local<Value> exc = (er.what() == NULL) ?
+        Nan::ErrnoException(er.code(), NULL, "Unknown error") :
+        Nan::Error(er.what());
+
       if (pUserNameW) free(pUserNameW);
       return Nan::ThrowError(exc);
     }

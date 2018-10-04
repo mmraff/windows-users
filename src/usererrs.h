@@ -1,32 +1,37 @@
-#ifndef __USERERRS_H__
-#define __USERERRS_H__
+#ifndef __USERERRS_2_H__
+#define __USERERRS_2_H__
 
-class Snag {
+#include <stdexcept>
+
+class WinUsersError : public std::exception {
   public:
-    Snag(unsigned long hcode) : _code(hcode) {}
-    ~Snag() {}
-    unsigned long code() { return _code; }
-    virtual const char* message() = 0;
+    WinUsersError(unsigned long hcode) noexcept : _code(hcode) {}
+    WinUsersError& operator=(const WinUsersError& other) noexcept {
+      _code = other._code;
+      return *this;
+    }
+    unsigned long code() const noexcept { return _code; }
+    virtual const char* what() const noexcept { return ""; }
   protected:
     unsigned long _code;
 };
 
-class APISnag : virtual public Snag {
+class APIError : public WinUsersError {
   public:
-    APISnag(unsigned long hcode) : Snag(hcode) {}
-    const char* message();
+    APIError(unsigned long hcode) : WinUsersError(hcode) {}
+    virtual const char* what() const noexcept;
 };
 
-class SystemSnag : virtual public Snag {
+class SysError : public WinUsersError {
   public:
-    SystemSnag(unsigned long hcode) : Snag(hcode) {}
-    const char* message();
+    SysError(unsigned long hcode) : WinUsersError(hcode) {}
+    virtual const char* what() const noexcept;
 };
 
-class UsageSnag : virtual public Snag {
+class UsageError : public WinUsersError {
   public:
-    UsageSnag(unsigned long hcode) : Snag(hcode) {}
-    const char* message();
+    UsageError(unsigned long hcode) : WinUsersError(hcode) {}
+    virtual const char* what() const noexcept;
 };
 
 #endif

@@ -2,7 +2,6 @@
 #include <assert.h>
 #include "userinfo.h"
 #include "xferlist.h"
-#include "usererrs.h"
 #include "wstrutils.h"
 
 using namespace mmrwinusers;

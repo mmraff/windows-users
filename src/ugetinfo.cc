@@ -49,7 +49,7 @@ UserInfo* getUserDetails(
     &pBuffer
   );
 
-  if (status != NERR_Success) throw new APISnag(status);
+  if (status != NERR_Success) throw APIError(status);
   else
   {
     if (pBuffer)
@@ -69,9 +69,9 @@ UserInfo* getUserDetails(
           translateUserInfo20(pUI20, *pInfo);
         }
       }
-      catch (Snag* pS) {
+      catch (WinUsersError& er) {
         NetApiBufferFree(pBuffer);
-        throw pS;
+        throw er;
       }
     }
 
@@ -80,4 +80,3 @@ UserInfo* getUserDetails(
 
   return pInfo;
 }
-

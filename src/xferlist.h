@@ -35,7 +35,7 @@ void XferList<T>::Expand(size_t addCount)
   {
     try { _pList = new T[addCount]; }
     catch (...) {}
-    if (_pList == NULL) throw new SystemSnag(ENOMEM);
+    if (_pList == NULL) throw SysError(ENOMEM);
 
     memset(_pList, NULL, addCount * sizeof(T));
   }
@@ -44,7 +44,7 @@ void XferList<T>::Expand(size_t addCount)
     T* pTemp = NULL;
     try { pTemp = new T[_count + addCount]; }
     catch (...) {}
-    if (pTemp == NULL) throw new SystemSnag(ENOMEM);
+    if (pTemp == NULL) throw SysError(ENOMEM);
 
     memcpy(pTemp, _pList, _count * sizeof(T)); // pTemp <-- _pList
     memset(pTemp + _count, NULL, addCount * sizeof(T));

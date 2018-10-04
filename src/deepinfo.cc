@@ -104,7 +104,7 @@ void UserDeepInfo::SetLogonHours(const unsigned char* p)
   // with array notation, expecting to get 21 unsigned char values.
   size_t sz = sizeof(unsigned) * 7;
   this->logonHours = (unsigned*)malloc(sz);
-  if (this->logonHours == NULL) throw new SystemSnag(ENOMEM);
+  if (this->logonHours == NULL) throw SysError(ENOMEM);
   memset(this->logonHours, NULL, sz);
 
   int i = 0, o = 0;

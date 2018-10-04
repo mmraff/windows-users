@@ -1,6 +1,6 @@
 {
   "name": "windows-users",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Native addon for Node.js to query Windows User API",
   "license": "MIT",
   "author": {
@@ -14,12 +14,14 @@
   "bugs": {
     "url": "https://github.com/mmraff/windows-users/issues"
   },
-  "os": [ "win32" ],
+  "os": [
+    "win32"
+  ],
   "main": "index.js",
   "gypfile": true,
   "dependencies": {
     "bindings": "~1.2.1",
-    "nan": "2.4.x"
+    "nan": "2.7.x"
   },
   "devDependencies": {
     "chai": "^3.4",
