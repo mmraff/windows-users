@@ -5,13 +5,13 @@
 
 class WinUsersError : public std::exception {
   public:
-    WinUsersError(unsigned long hcode) noexcept : _code(hcode) {}
-    WinUsersError& operator=(const WinUsersError& other) noexcept {
+    WinUsersError(unsigned long hcode) : _code(hcode) {}
+    WinUsersError& operator=(const WinUsersError& other) {
       _code = other._code;
       return *this;
     }
-    unsigned long code() const noexcept { return _code; }
-    virtual const char* what() const noexcept { return ""; }
+    unsigned long code() const { return _code; }
+    virtual const char* what() const { return ""; }
   protected:
     unsigned long _code;
 };
@@ -19,19 +19,19 @@ class WinUsersError : public std::exception {
 class APIError : public WinUsersError {
   public:
     APIError(unsigned long hcode) : WinUsersError(hcode) {}
-    virtual const char* what() const noexcept;
+    virtual const char* what() const;
 };
 
 class SysError : public WinUsersError {
   public:
     SysError(unsigned long hcode) : WinUsersError(hcode) {}
-    virtual const char* what() const noexcept;
+    virtual const char* what() const;
 };
 
 class UsageError : public WinUsersError {
   public:
     UsageError(unsigned long hcode) : WinUsersError(hcode) {}
-    virtual const char* what() const noexcept;
+    virtual const char* what() const;
 };
 
 #endif

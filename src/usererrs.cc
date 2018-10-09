@@ -3,7 +3,7 @@
 #include <lmerr.h>
 #include "usererrs.h"
 
-const char* APIError::what() const noexcept
+const char* APIError::what() const
 {
   switch (_code)
   {
@@ -53,7 +53,7 @@ const char* APIError::what() const noexcept
   return NULL;
 }
 
-const char* SysError::what() const noexcept
+const char* SysError::what() const
 {
   switch (_code)
   {
@@ -65,7 +65,7 @@ const char* SysError::what() const noexcept
   return NULL;
 }
 
-const char* UsageError::what() const noexcept
+const char* UsageError::what() const
 {
   switch (_code)
   {
